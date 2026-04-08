@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MathBoost — Álgebra Interactiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --blue:#185FA5;--blue-dark:#0C447C;--blue-light:#E6F1FB;
+  --gold:#BA7517;--gold-light:#FAEEDA;
+  --green:#3B6D11;--green-light:#EAF3DE;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --orange:#854F0B;--orange-light:#FAEEDA;
+  --gray-50:#F8F9FA;--gray-100:#F1F3F5;--gray-200:#E9ECEF;
+  --gray-300:#DEE2E6;--gray-500:#868E96;--gray-700:#495057;--gray-900:#212529;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --radius:10px;--radius-sm:7px;--shadow:0 2px 12px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--gray-50);color:var(--gray-900);min-height:100vh}
+.app{max-width:860px;margin:0 auto;padding:16px}
+
+/* TOP BAR */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+  background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);
+  margin-bottom:14px;box-shadow:var(--shadow);flex-wrap:wrap;gap:10px}
+.logo{font-size:22px;font-weight:700;color:var(--blue);letter-spacing:-.5px}
+.logo span{color:var(--gold)}
+.top-right{display:flex;gap:8px;align-items:center}
+.prog-chip{font-size:13px;padding:5px 12px;border-radius:20px;background:var(--blue-light);
+  color:var(--blue);font-weight:500}
+.btn-lang{font-size:13px;padding:7px 14px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--gray-300);background:#fff;cursor:pointer;
+  color:var(--gray-700);font-family:var(--font);font-weight:500;transition:all .15s}
+.btn-lang:hover{border-color:var(--blue);color:var(--blue)}
+
+/* TABS */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{padding:9px 15px;border-radius:var(--radius-sm);border:1.5px solid var(--gray-200);
+  background:#fff;cursor:pointer;font-size:13px;color:var(--gray-500);
+  font-family:var(--font);font-weight:500;transition:all .15s}
+.tab:hover{border-color:var(--blue);color:var(--blue)}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tab-finish{margin-left:auto;border-color:var(--green-light);color:var(--green);background:var(--green-light)}
+.tab-finish:hover{background:#d4edbc;border-color:var(--green)}
+
+/* CARD */
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);
+  padding:22px;margin-bottom:14px;box-shadow:var(--shadow)}
+
+/* EXERCISE HEADER */
+.ex-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.level-badge{font-size:11px;padding:4px 11px;border-radius:20px;font-weight:600;letter-spacing:.3px}
+.lv-basic{background:var(--green-light);color:var(--green)}
+.lv-mid{background:var(--orange-light);color:var(--orange)}
+.lv-adv{background:var(--red-light);color:var(--red)}
+
+/* PROBLEM BOX */
+.problem-box{background:var(--blue-light);border-left:4px solid var(--blue);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;
+  padding:14px 16px;margin-bottom:16px;font-size:15px;line-height:1.6}
+.problem-box .eq{font-size:18px;font-weight:600;margin-top:8px;color:var(--blue);
+  font-family:monospace;letter-spacing:.3px}
+
+/* STEPS */
+.steps-container{margin-bottom:16px}
+.step{display:flex;gap:12px;margin-bottom:12px;animation:fadeUp .25s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  font-weight:600;flex-shrink:0;margin-top:2px}
+.step-body{flex:1;background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 13px;border:1px solid var(--gray-200)}
+.step-op{font-size:11px;color:var(--blue);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.step-eq{font-size:15px;color:var(--gray-900);font-family:monospace;line-height:1.5}
+.step-why{font-size:12px;color:var(--gray-500);font-style:italic;margin-top:4px}
+
+/* ANSWER BOX */
+.answer-box{background:linear-gradient(135deg,var(--blue-light),#dbeeff);
+  border:2px solid var(--blue);border-radius:var(--radius);
+  padding:14px 18px;text-align:center;margin-bottom:16px}
+.ans-label{font-size:11px;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ans-val{font-size:22px;font-weight:700;color:var(--blue-dark);font-family:monospace}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn-primary{padding:9px 22px;background:var(--blue);color:#fff;border:none;
+  border-radius:var(--radius-sm);cursor:pointer;font-size:14px;
+  font-family:var(--font);font-weight:600;transition:all .15s}
+.btn-primary:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.btn-secondary{padding:9px 22px;background:#fff;border:1.5px solid var(--gray-300);
+  border-radius:var(--radius-sm);cursor:pointer;font-size:14px;
+  font-family:var(--font);font-weight:500;color:var(--gray-700);transition:all .15s}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+
+/* OPTIONS */
+.opt-grid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.opt-btn{padding:11px 16px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+  background:#fff;cursor:pointer;font-size:14px;color:var(--gray-700);
+  text-align:left;transition:all .15s;font-family:var(--font)}
+.opt-btn:hover:not(:disabled){border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+.opt-btn.correct{background:var(--green-light);border-color:var(--green);color:var(--green);font-weight:600}
+.opt-btn.wrong{background:var(--red-light);border-color:var(--red);color:var(--red)}
+
+/* GRAPH OPTIONS */
+.graph-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.graph-opt-btn{padding:8px;border:1.5px solid var(--gray-200);border-radius:var(--radius-sm);
+  background:#fff;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:5px;transition:all .15s;font-family:var(--font)}
+.graph-opt-btn:hover:not(:disabled){border-color:var(--blue);background:var(--blue-light)}
+.graph-opt-btn.correct{border-color:var(--green);background:var(--green-light)}
+.graph-opt-btn.wrong{border-color:var(--red);background:var(--red-light)}
+.graph-opt-lbl{font-size:12px;color:var(--gray-500);font-family:monospace}
+
+/* FEEDBACK */
+.feedback{font-size:13px;margin-top:10px;padding:9px 13px;border-radius:var(--radius-sm);font-weight:500}
+.fb-ok{background:var(--green-light);color:var(--green);border:1px solid #b5d98a}
+.fb-no{background:var(--red-light);color:var(--red);border:1px solid #f5b8b8}
+
+/* GRAPH WRAP */
+.graph-wrap{background:var(--gray-50);border:1px solid var(--gray-200);
+  border-radius:var(--radius-sm);padding:12px;display:flex;justify-content:center;margin-bottom:14px}
+
+/* SCORE CARD */
+.score-card{text-align:center;padding:36px 24px}
+.score-circle{width:120px;height:120px;border-radius:50%;background:var(--blue-light);
+  border:4px solid var(--blue);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;margin:0 auto 16px}
+.score-num{font-size:40px;font-weight:700;color:var(--blue);line-height:1}
+.score-denom{font-size:14px;color:var(--blue);font-weight:500}
+.score-label{font-size:15px;color:var(--gray-500);margin-bottom:14px}
+.perf-badge{display:inline-block;padding:10px 28px;border-radius:25px;font-size:16px;font-weight:700;letter-spacing:.3px}
+.perf-insuf{background:var(--red-light);color:var(--red)}
+.perf-suf{background:var(--orange-light);color:var(--orange)}
+.perf-good{background:var(--green-light);color:var(--green)}
+.perf-exc{background:var(--blue-light);color:var(--blue)}
+.stats-row{display:flex;gap:12px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.stat-card{background:var(--gray-50);border:1px solid var(--gray-200);
+  border-radius:var(--radius-sm);padding:14px 22px;text-align:center;min-width:90px}
+.stat-val{font-size:24px;font-weight:700;color:var(--gray-900)}
+.stat-lbl{font-size:12px;color:var(--gray-500);margin-top:2px}
+
+/* MODULE CARDS (home screen) */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.module-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:var(--radius);
+  padding:18px;cursor:pointer;transition:all .2s;text-align:center}
+.module-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(24,95,165,.12)}
+.module-card.active{border-color:var(--blue);background:var(--blue-light)}
+.module-icon{font-size:28px;margin-bottom:8px}
+.module-title{font-size:14px;font-weight:600;color:var(--gray-900);margin-bottom:4px}
+.module-sub{font-size:12px;color:var(--gray-500)}
+
+@media(max-width:580px){
+  .tabs{gap:4px}.tab{padding:7px 9px;font-size:12px}
+  .graph-opts{grid-template-columns:1fr 1fr}
+  .top-bar{padding:11px 14px}
+  .card{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div class="logo">Math<span>Boost</span></div>
+    <div class="top-right">
+      <span class="prog-chip" id="prog-txt">0 / 0</span>
+      <button class="btn-lang" onclick="toggleLang()">🌐 <span id="lang-lbl">English</span></button>
+    </div>
+  </div>
+  <div class="tabs" id="tab-bar"></div>
+  <div id="main-area"></div>
+</div>
+
+<script>
+const T={
+  es:{
+    tabs:['Concepto de Función','Ecuaciones Lineales','Funciones Lineales','Aplicaciones'],
+    tabsShort:['Función','Ecuaciones','Func. Lineal','Aplicac.'],
+    modules:[
+      {icon:'📐',title:'Concepto de Función',sub:'Dominio, rango y evaluación'},
+      {icon:'⚖️',title:'Ecuaciones Lineales',sub:'Despeje, fracciones y literales'},
+      {icon:'📈',title:'Funciones Lineales',sub:'Pendiente, intercepto y gráficas'},
+      {icon:'🌍',title:'Aplicaciones',sub:'Problemas de contexto real'},
+    ],
+    reveal:'Ver solución paso a paso',next:'Siguiente ejercicio',finish:'Finalizar',restart:'Volver al inicio',
+    problem:'Ejercicio',level:['Básico','Intermedio','Avanzado'],answer:'Respuesta final',
+    score:'Calificación',perf:['Insuficiente','Suficiente','Bueno','Excelente'],
+    perfRange:['(0 – 6.9)','(7 – 7.9)','(8 – 8.9)','(9 – 10)'],
+    answered:'Resueltos',correct:'Correctos',incorrect:'Por revisar',selOpt:'Selecciona una opción:',
+    ops:{dist:'Propiedad distributiva',simp:'Simplificar términos semejantes',isol:'Aislar la variable',
+      div:'Dividir ambos lados',mult:'Multiplicar ambos lados',lcd:'Multiplicar por el MCM',
+      move:'Pasar términos al mismo lado',sub:'Sustituir y verificar',slope:'Calcular pendiente',
+      intercept:'Identificar intercepto',form:'Escribir ecuación',model:'Plantear modelo',
+      solve:'Resolver',eval:'Evaluar',despej:'Despejar la variable',cross:'Multiplicar en cruz',
+      elim:'Método de eliminación',sust:'Método de sustitución',check:'Verificar solución'},
+    why:{dist:'Eliminamos paréntesis multiplicando.',simp:'Combinamos términos semejantes.',
+      isol:'Agrupamos variables a un lado y constantes al otro.',
+      div:'Despejamos x dividiendo por su coeficiente.',mult:'Eliminamos un coeficiente multiplicando.',
+      lcd:'Convertimos a enteros multiplicando por el MCM.',move:'Trasladamos el término con x.',
+      sub:'Verificamos que la solución satisface la ecuación.',slope:'m = (y₂−y₁)/(x₂−x₁).',
+      intercept:'b es donde la recta cruza el eje y.',form:'Sustituimos m y b en y = mx + b.',
+      model:'Identificamos variable independiente y dependiente.',solve:'Despejamos la incógnita.',
+      eval:'Sustituimos el valor dado.',despej:'Aplicamos operaciones inversas para despejar.',
+      cross:'Multiplicamos en cruz para eliminar denominadores.',
+      elim:'Sumamos o restamos ecuaciones para eliminar una variable.',
+      sust:'Sustituimos la expresión despejada.',check:'Sustituimos la solución en ambas ecuaciones.'},
+    graphChoose:'¿Cuál gráfica corresponde a la ecuación?',
+    identMB:'Identifica m y b del siguiente contexto:',
+  },
+  en:{
+    tabs:['Function Concept','Linear Equations','Linear Functions','Applications'],
+    tabsShort:['Function','Equations','Lin. Func.','Applic.'],
+    modules:[
+      {icon:'📐',title:'Function Concept',sub:'Domain, range and evaluation'},
+      {icon:'⚖️',title:'Linear Equations',sub:'Solving, fractions and formulas'},
+      {icon:'📈',title:'Linear Functions',sub:'Slope, intercept and graphs'},
+      {icon:'🌍',title:'Applications',sub:'Real-world problems'},
+    ],
+    reveal:'Show step-by-step solution',next:'Next exercise',finish:'Finish',restart:'Back to start',
+    problem:'Exercise',level:['Basic','Intermediate','Advanced'],answer:'Final answer',
+    score:'Score',perf:['Insufficient','Sufficient','Good','Excellent'],
+    perfRange:['(0 – 6.9)','(7 – 7.9)','(8 – 8.9)','(9 – 10)'],
+    answered:'Answered',correct:'Correct',incorrect:'To review',selOpt:'Select an option:',
+    ops:{dist:'Distributive property',simp:'Simplify like terms',isol:'Isolate the variable',
+      div:'Divide both sides',mult:'Multiply both sides',lcd:'Multiply by LCD',
+      move:'Move terms to same side',sub:'Substitute and verify',slope:'Calculate slope',
+      intercept:'Identify y-intercept',form:'Write equation',model:'Set up model',
+      solve:'Solve',eval:'Evaluate',despej:'Isolate the indicated variable',cross:'Cross-multiply',
+      elim:'Elimination method',sust:'Substitution method',check:'Verify solution'},
+    why:{dist:'We remove parentheses by multiplying.',simp:'We combine like terms.',
+      isol:'We group variables on one side, constants on the other.',
+      div:'We isolate x by dividing by its coefficient.',mult:'We eliminate a coefficient by multiplying.',
+      lcd:'We convert to integers by multiplying by the LCD.',move:'We move the x-term to one side.',
+      sub:'We verify our answer satisfies the original equation.',slope:'m = (y₂−y₁)/(x₂−x₁).',
+      intercept:'b is where the line crosses the y-axis.',form:'We substitute m and b into y = mx + b.',
+      model:'We identify the independent and dependent variables.',solve:'We isolate the unknown.',
+      eval:'We substitute the given value.',despej:'We apply inverse operations to isolate.',
+      cross:'We cross-multiply to clear denominators.',
+      elim:'We add/subtract equations to eliminate one variable.',
+      sust:'We substitute the isolated expression.',check:'We substitute the solution into both equations.'},
+    graphChoose:'Which graph matches the equation?',
+    identMB:'Identify m and b from the context:',
+  }
+};
+
+let lang='es', tab=0, exTotal=0, exCorrect=0, currentEx=null, revealed=false;
+const t=k=>T[lang][k];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const gcd=(a,b)=>b===0?Math.abs(a):gcd(b,a%b);
+const lcm=(a,b)=>Math.abs(a*b)/gcd(a,b);
+const fmtCoef=(c,v='x')=>c===1?v:c===-1?`-${v}`:`${c}${v}`;
+const fmtSign=n=>n>=0?`+ ${n}`:`- ${Math.abs(n)}`;
+
+// ── GRAPHS ───────────────────────────────────────────────────────────────────
+function drawGraph(m,b,W=200,H=190,color='#185FA5'){
+  const pad=22,cx=W/2,cy=H/2,step=16;
+  const tx=x=>cx+x*step, ty=y=>cy-y*step;
+  let s='';
+  for(let i=-5;i<=5;i++){
+    s+=`<line x1="${tx(i)}" y1="${pad}" x2="${tx(i)}" y2="${H-pad}" stroke="#E9ECEF" stroke-width="0.7"/>`;
+    s+=`<line x1="${pad}" y1="${ty(i)}" x2="${W-pad}" y2="${ty(i)}" stroke="#E9ECEF" stroke-width="0.7"/>`;
+  }
+  s+=`<line x1="${pad}" y1="${cy}" x2="${W-pad}" y2="${cy}" stroke="#868E96" stroke-width="1.5"/>`;
+  s+=`<line x1="${cx}" y1="${pad}" x2="${cx}" y2="${H-pad}" stroke="#868E96" stroke-width="1.5"/>`;
+  for(let i=-4;i<=4;i++){
+    if(i===0)continue;
+    s+=`<text x="${tx(i)}" y="${cy+13}" text-anchor="middle" font-size="8" fill="#868E96">${i}</text>`;
+    s+=`<text x="${cx-10}" y="${ty(i)+3}" text-anchor="end" font-size="8" fill="#868E96">${i}</text>`;
+  }
+  s+=`<text x="${W-pad+3}" y="${cy+5}" font-size="9" fill="#868E96">x</text>`;
+  s+=`<text x="${cx+4}" y="${pad-2}" font-size="9" fill="#868E96">y</text>`;
+  const x1=-5.5,y1=m*x1+b,x2=5.5,y2=m*x2+b;
+  s+=`<line x1="${tx(x1)}" y1="${ty(y1)}" x2="${tx(x2)}" y2="${ty(y2)}" stroke="${color}" stroke-width="2.2" stroke-linecap="round"/>`;
+  if(b>=-4.5&&b<=4.5) s+=`<circle cx="${cx}" cy="${ty(b)}" r="4" fill="${color}"/>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:'Plus Jakarta Sans',sans-serif">${s}</svg>`;
+}
+
+function drawGraphLarge(m,b){
+  const W=300,H=270,pad=28,cx=W/2,cy=H/2,step=20;
+  const tx=x=>cx+x*step, ty=y=>cy-y*step;
+  let s='';
+  for(let i=-6;i<=6;i++){
+    s+=`<line x1="${tx(i)}" y1="${pad}" x2="${tx(i)}" y2="${H-pad}" stroke="#E9ECEF" stroke-width="0.7"/>`;
+    s+=`<line x1="${pad}" y1="${ty(i)}" x2="${W-pad}" y2="${ty(i)}" stroke="#E9ECEF" stroke-width="0.7"/>`;
+  }
+  s+=`<line x1="${pad}" y1="${cy}" x2="${W-pad}" y2="${cy}" stroke="#495057" stroke-width="1.5"/>`;
+  s+=`<line x1="${cx}" y1="${pad}" x2="${cx}" y2="${H-pad}" stroke="#495057" stroke-width="1.5"/>`;
+  for(let i=-5;i<=5;i++){
+    if(i===0)continue;
+    s+=`<text x="${tx(i)}" y="${cy+14}" text-anchor="middle" font-size="9" fill="#868E96">${i}</text>`;
+    s+=`<text x="${cx-12}" y="${ty(i)+3}" text-anchor="end" font-size="9" fill="#868E96">${i}</text>`;
+  }
+  s+=`<text x="${W-pad+4}" y="${cy+5}" font-size="10" fill="#868E96">x</text>`;
+  s+=`<text x="${cx+4}" y="${pad-2}" font-size="10" fill="#868E96">y</text>`;
+  const x1=-6,y1=m*x1+b,x2=6,y2=m*x2+b;
+  s+=`<line x1="${tx(x1)}" y1="${ty(y1)}" x2="${tx(x2)}" y2="${ty(y2)}" stroke="#185FA5" stroke-width="2.5" stroke-linecap="round"/>`;
+  if(b>=-5&&b<=5) s+=`<circle cx="${cx}" cy="${ty(b)}" r="4.5" fill="#185FA5"/>`;
+  const sb=b>=0?`+${b}`:`${b}`;
+  s+=`<text x="${W-pad-4}" y="${pad+14}" text-anchor="end" font-size="10" fill="#185FA5" font-weight="600">y=${m}x${sb}</text>`;
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="font-family:'Plus Jakarta Sans',sans-serif">${s}</svg>`;
+}
+
+// ── GENERATORS ───────────────────────────────────────────────────────────────
+function genFunction(){
+  const type=pick(['eval_lin','eval_quad','domain_range','is_function']);
+  if(type==='eval_lin'){
+    const a=rnd(-4,4)||1,b=rnd(-6,6),x0=rnd(-4,4);
+    const res=a*x0+b;
+    const sb=b>=0?`+ ${b}`:`- ${Math.abs(b)}`;
+    return{level:0,q:lang==='es'?`Evalúa la función en x = ${x0}:`:`Evaluate the function at x = ${x0}:`,
+      eq:`f(x) = ${fmtCoef(a,'x')} ${sb}`,
+      steps:[{op:'eval',why:'eval',eq:`f(${x0}) = ${a}(${x0}) ${sb}`},{op:'simp',why:'simp',eq:`f(${x0}) = ${a*x0} ${sb}`},{op:'simp',why:'simp',eq:`f(${x0}) = ${res}`}],
+      answer:`f(${x0}) = ${res}`,type:'open'};
+  }
+  if(type==='eval_quad'){
+    const a=rnd(1,3),b=rnd(-4,4),x0=rnd(-3,3);
+    const res=a*x0*x0+b;
+    const sb=b>=0?`+ ${b}`:`- ${Math.abs(b)}`;
+    return{level:1,q:lang==='es'?`Evalúa la función en x = ${x0}:`:`Evaluate the function at x = ${x0}:`,
+      eq:`f(x) = ${a}x² ${sb}`,
+      steps:[{op:'eval',why:'eval',eq:`f(${x0}) = ${a}(${x0})² ${sb}`},{op:'simp',why:'simp',eq:`f(${x0}) = ${a}·${x0*x0} ${sb}`},{op:'simp',why:'simp',eq:`f(${x0}) = ${a*x0*x0} ${sb}`},{op:'simp',why:'simp',eq:`f(${x0}) = ${res}`}],
+      answer:`f(${x0}) = ${res}`,type:'open'};
+  }
+  if(type==='domain_range'){
+    const a=rnd(1,3)||1,b=rnd(-4,4);
+    const dom=[-2,-1,0,1,2],rng=dom.map(x=>a*x+b);
+    const sb=b>=0?`+ ${b}`:`- ${Math.abs(b)}`;
+    return{level:1,q:lang==='es'?`f(x) = ${fmtCoef(a,'x')} ${sb}. Dominio = {${dom.join(', ')}}. Calcula el rango.`:`f(x) = ${fmtCoef(a,'x')} ${sb}. Domain = {${dom.join(', ')}}. Find the range.`,
+      eq:'',steps:dom.map((x,i)=>({op:'eval',why:'eval',eq:`f(${x}) = ${a}(${x}) ${sb} = ${rng[i]}`})),
+      answer:lang==='es'?`Rango = {${rng.join(', ')}}`:`Range = {${rng.join(', ')}}`,type:'open'};
+  }
+  const isFunc=Math.random()>0.4;
+  const goodP=[[1,3],[2,5],[3,7],[4,9]],badP=[[1,2],[1,4],[2,6],[3,8]];
+  const pairs=isFunc?goodP:badP;
+  const pStr=pairs.map(p=>`(${p[0]},${p[1]})`).join(', ');
+  const opts=lang==='es'?['Sí, cada x tiene exactamente una imagen','No, porque x=1 tiene dos imágenes distintas','Sí, porque los valores de y son distintos','No, el dominio no está completo']:['Yes, each x has exactly one image','No, because x=1 has two different images','Yes, because y-values are different','No, the domain is incomplete'];
+  const correct=isFunc?0:1;
+  return{level:0,q:lang==='es'?`¿El conjunto {${pStr}} representa una función?`:`Does {${pStr}} represent a function?`,
+    eq:'',steps:[{op:'eval',why:'eval',eq:lang==='es'?'Revisamos si algún x tiene más de una imagen.':'We check if any x has more than one image.'},{op:'simp',why:'simp',eq:isFunc?(lang==='es'?'Cada x aparece una sola vez → es función.':'Each x appears only once → it is a function.'):(lang==='es'?'x = 1 aparece con y = 2 y y = 4 → no es función.':'x = 1 appears with y = 2 and y = 4 → not a function.')}],
+    answer:opts[correct],type:'mc',opts,correct};
+}
+
+function genEquation(){
+  const type=pick(['basic','parens','fractions','literal','denom']);
+  if(type==='basic'){
+    const a=rnd(2,7),b=rnd(-10,10),c=rnd(-10,15);
+    const sol=(c-b)/a;
+    return{level:0,q:lang==='es'?'Resuelve para x:':'Solve for x:',eq:`${a}x ${fmtSign(b)} = ${c}`,
+      steps:[{op:'isol',why:'isol',eq:`${a}x = ${c} ${fmtSign(-b)}`},{op:'simp',why:'simp',eq:`${a}x = ${c-b}`},{op:'div',why:'div',eq:`x = ${c-b} ÷ ${a} = ${+(sol.toFixed(2))}`},{op:'sub',why:'sub',eq:`Verif: ${a}(${+(sol.toFixed(2))}) ${fmtSign(b)} = ${+(a*sol+b).toFixed(1)} ✓`}],
+      answer:`x = ${+(sol.toFixed(2))}`,type:'open'};
+  }
+  if(type==='parens'){
+    const a=rnd(2,5),b=rnd(1,6),c=rnd(1,4),d=rnd(5,20);
+    const numer=d+a*b,denom=a-c;
+    const sol=denom!==0?numer/denom:1;
+    return{level:1,q:lang==='es'?'Resuelve con paréntesis:':'Solve with parentheses:',eq:`${a}(x ${fmtSign(-b)}) = ${c}x ${fmtSign(d)}`,
+      steps:[{op:'dist',why:'dist',eq:`${a}x ${fmtSign(-a*b)} = ${c}x ${fmtSign(d)}`},{op:'move',why:'move',eq:`${a}x - ${c}x = ${d} ${fmtSign(a*b)}`},{op:'simp',why:'simp',eq:`${denom}x = ${numer}`},{op:'div',why:'div',eq:`x = ${numer} ÷ ${denom} = ${+(sol.toFixed(2))}`}],
+      answer:`x = ${+(sol.toFixed(2))}`,type:'open'};
+  }
+  if(type==='fractions'){
+    const d1=pick([2,3,4,6]),d2=pick([3,4,6]);
+    const LC=lcm(d1,d2),n1=rnd(1,d1-1)||1,n2=rnd(1,d2-1)||1;
+    const A=n1*(LC/d1),B=n2*(LC/d2),C=rnd(4,15);
+    const sol=(C*LC)/(A-B);
+    return{level:1,q:lang==='es'?'Resuelve con fracciones:':'Solve with fractions:',eq:`(${n1}/${d1})x − (${n2}/${d2})x = ${C}`,
+      steps:[{op:'lcd',why:'lcd',eq:`MCM(${d1}, ${d2}) = ${LC}. Multiplicamos por ${LC}`},{op:'simp',why:'simp',eq:`${A}x − ${B}x = ${C*LC}`},{op:'simp',why:'simp',eq:`${A-B}x = ${C*LC}`},{op:'div',why:'div',eq:`x = ${C*LC} ÷ ${A-B} = ${+(sol.toFixed(2))}`}],
+      answer:`x = ${+(sol.toFixed(2))}`,type:'open'};
+  }
+  if(type==='literal'){
+    const fms=[
+      {f:'v = v₀ + at',d:'a',steps:[{op:'despej',why:'despej',eq:'v = v₀ + at'},{op:'isol',why:'isol',eq:'v − v₀ = at'},{op:'div',why:'div',eq:'a = (v − v₀) / t'}],ans:'a = (v − v₀) / t'},
+      {f:'P = 2l + 2w',d:'l',steps:[{op:'despej',why:'despej',eq:'P = 2l + 2w'},{op:'isol',why:'isol',eq:'P − 2w = 2l'},{op:'div',why:'div',eq:'l = (P − 2w) / 2'}],ans:'l = (P − 2w) / 2'},
+      {f:'C = (5/9)(F − 32)',d:'F',steps:[{op:'despej',why:'despej',eq:'C = (5/9)(F − 32)'},{op:'mult',why:'mult',eq:'(9/5)C = F − 32'},{op:'isol',why:'isol',eq:'F = (9/5)C + 32'}],ans:'F = (9/5)C + 32'},
+      {f:'A = bh/2',d:'h',steps:[{op:'mult',why:'mult',eq:'2A = bh'},{op:'div',why:'div',eq:'h = 2A / b'}],ans:'h = 2A / b'},
+    ];
+    const fm=pick(fms);
+    return{level:2,q:lang==='es'?'Despeja la variable indicada en la fórmula:':'Isolate the indicated variable:',
+      eq:`${fm.f}  →  ${lang==='es'?'despejar':'isolate'} ${fm.d}`,steps:fm.steps,answer:fm.ans,type:'open'};
+  }
+  const a=rnd(2,12),b=rnd(1,6),c=rnd(1,6);
+  const sol=(a/c)-b;
+  return{level:2,q:lang==='es'?'Resuelve (variable en el denominador):':'Solve (variable in denominator):',
+    eq:`${a} / (x ${fmtSign(b)}) = ${c}`,
+    steps:[{op:'cross',why:'cross',eq:`${a} = ${c}(x ${fmtSign(b)})`},{op:'dist',why:'dist',eq:`${a} = ${c}x ${fmtSign(c*b)}`},{op:'isol',why:'isol',eq:`${a} ${fmtSign(-c*b)} = ${c}x`},{op:'simp',why:'simp',eq:`${a-c*b} = ${c}x`},{op:'div',why:'div',eq:`x = ${a-c*b} / ${c} = ${+(sol.toFixed(2))}`}],
+    answer:`x = ${+(sol.toFixed(2))}`,type:'open'};
+}
+
+function genLinear(){
+  const type=pick(['identify_mb','find_eq','general_form','choose_graph','context_mb']);
+  const m=rnd(-4,4)||1, b=rnd(-5,5);
+  const sb=b>=0?`+ ${b}`:`- ${Math.abs(b)}`;
+  if(type==='identify_mb'){
+    const opts=[`m = ${m},  b = ${b}`,`m = ${b},  b = ${m}`,`m = ${-m},  b = ${Math.abs(b)}`,`m = ${m},  b = ${-b}`];
+    return{level:0,q:lang==='es'?'Identifica la pendiente m y el intercepto b:':'Identify slope m and y-intercept b:',eq:`y = ${fmtCoef(m,'x')} ${sb}`,
+      steps:[{op:'form',why:'form',eq:lang==='es'?'Forma pendiente-intercepto: y = mx + b':'Slope-intercept form: y = mx + b'},{op:'slope',why:'slope',eq:`m = ${m}`},{op:'intercept',why:'intercept',eq:`b = ${b}`}],
+      answer:`m = ${m},  b = ${b}`,type:'mc',opts,correct:0,showGraph:true,graphM:m,graphB:b};
+  }
+  if(type==='find_eq'){
+    const x1=rnd(-3,-1),y1=m*x1+b,x2=rnd(1,3),y2=m*x2+b;
+    return{level:1,q:lang==='es'?`Encuentra la ecuación de la recta que pasa por (${x1}, ${y1}) y (${x2}, ${y2}):`:`Find the equation of the line through (${x1}, ${y1}) and (${x2}, ${y2}):`,
+      eq:'',steps:[{op:'slope',why:'slope',eq:`m = (${y2} − ${y1}) / (${x2} − ${x1}) = ${y2-y1} / ${x2-x1} = ${m}`},{op:'form',why:'form',eq:`y − ${y1} = ${m}(x − ${x1})`},{op:'dist',why:'dist',eq:`y − ${y1} = ${fmtCoef(m,'x')} ${fmtSign(-m*x1)}`},{op:'simp',why:'simp',eq:`y = ${fmtCoef(m,'x')} ${sb}`}],
+      answer:`y = ${fmtCoef(m,'x')} ${sb}`,type:'open',showGraph:true,graphM:m,graphB:b};
+  }
+  if(type==='general_form'){
+    return{level:2,q:lang==='es'?'Convierte a forma general Ax + By + C = 0:':'Convert to general form Ax + By + C = 0:',eq:`y = ${fmtCoef(m,'x')} ${sb}`,
+      steps:[{op:'move',why:'move',eq:`${fmtCoef(m,'x')} − y ${sb} = 0`},{op:'form',why:'form',eq:`${m}x − y ${b>=0?`+ ${b}`:`− ${Math.abs(b)}`} = 0`},{op:'intercept',why:'intercept',eq:lang==='es'?`Intercepto-y (x=0): y = ${b} | Intercepto-x (y=0): x = ${(-b/m).toFixed(2)}`:`y-int (x=0): y = ${b} | x-int (y=0): x = ${(-b/m).toFixed(2)}`}],
+      answer:`${m}x − y ${b>=0?`+ ${b}`:`− ${Math.abs(b)}`} = 0`,type:'open',showGraph:true,graphM:m,graphB:b};
+  }
+  if(type==='choose_graph'){
+    const opts_data=[{m,b},{m:m+(pick([-2,-1,1,2])),b},{m,b:b+(pick([-2,-1,1,2]))},{m:-m,b}];
+    return{level:1,q:t('graphChoose'),eq:`y = ${fmtCoef(m,'x')} ${sb}`,
+      steps:[{op:'slope',why:'slope',eq:`m = ${m} → ${lang==='es'?'pendiente':'slope'}: ${m>0?(lang==='es'?'creciente':'increasing'):(lang==='es'?'decreciente':'decreasing')}`},{op:'intercept',why:'intercept',eq:`b = ${b} → ${lang==='es'?'intercepto-y':'y-intercept'} en (0, ${b})`},{op:'form',why:'form',eq:lang==='es'?`La gráfica A es la correcta`:`Graph A is correct`}],
+      answer:`m = ${m},  b = ${b}`,type:'graph_mc',graphs:opts_data,correct:0};
+  }
+  const rate=rnd(10,50),base=rnd(50,200);
+  return{level:1,q:t('identMB'),eq:lang==='es'?`Un taxi cobra $${base} de banderazo más $${rate} por km.`:`A taxi charges $${base} base fare plus $${rate} per km.`,
+    steps:[{op:'model',why:'model',eq:lang==='es'?`Costo fijo (b) = $${base}`:`Fixed cost (b) = $${base}`},{op:'slope',why:'slope',eq:lang==='es'?`Tasa de cambio (m) = $${rate}/km`:`Rate of change (m) = $${rate}/km`},{op:'form',why:'form',eq:`C(x) = ${rate}x + ${base}`}],
+    answer:`m = ${rate},  b = ${base}`,type:'open',showGraph:true,graphM:rate,graphB:base};
+}
+
+function genApp(){
+  const type=pick(['speed','cost','temperature','savings','ages','system']);
+  if(type==='speed'){
+    const spd=rnd(40,120),time=rnd(1,6),d=spd*time;
+    return{level:0,q:lang==='es'?`Un auto viaja a ${spd} km/h. ¿Qué distancia recorre en ${time} hora${time>1?'s':''}?`:`A car travels at ${spd} km/h. How far in ${time} hour${time>1?'s':''}?`,
+      eq:'d = v · t',steps:[{op:'model',why:'model',eq:lang==='es'?'Modelo: d = velocidad × tiempo':'Model: d = speed × time'},{op:'eval',why:'eval',eq:`d = ${spd} × ${time}`},{op:'solve',why:'solve',eq:`d = ${d} km`}],
+      answer:`d = ${d} km`,type:'open'};
+  }
+  if(type==='cost'){
+    const base=rnd(50,300),rate=rnd(15,80),n=rnd(3,12),total=base+rate*n;
+    return{level:1,q:lang==='es'?`Un plomero cobra $${base} fijo más $${rate} por hora. ¿Cuánto por ${n} horas?`:`A plumber charges $${base} fixed plus $${rate}/hr. Cost for ${n} hours?`,
+      eq:`C(x) = ${base} + ${rate}x`,steps:[{op:'model',why:'model',eq:lang==='es'?`Costo fijo = $${base}, tasa = $${rate}/hr`:`Fixed = $${base}, rate = $${rate}/hr`},{op:'form',why:'form',eq:`C(x) = ${base} + ${rate}x`},{op:'eval',why:'eval',eq:`C(${n}) = ${base} + ${rate}(${n}) = ${base} + ${rate*n}`},{op:'solve',why:'solve',eq:`C(${n}) = $${total}`}],
+      answer:`$${total}`,type:'open',showGraph:true,graphM:rate,graphB:base};
+  }
+  if(type==='temperature'){
+    const C=rnd(-10,45),F=Math.round(C*9/5+32);
+    return{level:1,q:lang==='es'?`Convierte ${C}°C a Fahrenheit:`:`Convert ${C}°C to Fahrenheit:`,eq:'F = (9/5)C + 32',
+      steps:[{op:'model',why:'model',eq:lang==='es'?`Sustituimos C = ${C}`:`Substitute C = ${C}`},{op:'eval',why:'eval',eq:`F = (9/5)(${C}) + 32`},{op:'simp',why:'simp',eq:`F = ${(9/5*C).toFixed(1)} + 32`},{op:'solve',why:'solve',eq:`F = ${F}°F`}],
+      answer:`${C}°C = ${F}°F`,type:'open'};
+  }
+  if(type==='savings'){
+    const init=rnd(100,500),weekly=rnd(25,100),weeks=rnd(4,16),total=init+weekly*weeks;
+    return{level:1,q:lang==='es'?`Tienes $${init} ahorrados y ahorras $${weekly} por semana. ¿Cuánto en ${weeks} semanas?`:`You have $${init} saved and save $${weekly}/week. Total after ${weeks} weeks?`,
+      eq:`A(t) = ${init} + ${weekly}t`,steps:[{op:'model',why:'model',eq:lang==='es'?`Ahorro inicial = $${init}, semanal = $${weekly}`:`Initial = $${init}, weekly = $${weekly}`},{op:'form',why:'form',eq:`A(t) = ${init} + ${weekly}t`},{op:'eval',why:'eval',eq:`A(${weeks}) = ${init} + ${weekly}(${weeks}) = ${init+weekly*weeks}`},{op:'solve',why:'solve',eq:`A(${weeks}) = $${total}`}],
+      answer:`$${total}`,type:'open',showGraph:true,graphM:weekly,graphB:init};
+  }
+  if(type==='ages'){
+    const older=rnd(5,15),sum=rnd(30,60),younger=(sum-older)/2,olderAge=younger+older;
+    return{level:2,q:lang==='es'?`La suma de las edades de dos hermanos es ${sum}. El mayor tiene ${older} años más que el menor. ¿Cuántos años tiene cada uno?`:`Two siblings' ages sum to ${sum}. The older is ${older} years older. How old is each?`,
+      eq:lang==='es'?'Sea x = edad del menor':'Let x = younger age',
+      steps:[{op:'model',why:'model',eq:lang==='es'?`Menor = x,  Mayor = x + ${older}`:`Younger = x,  Older = x + ${older}`},{op:'form',why:'form',eq:`x + (x + ${older}) = ${sum}`},{op:'simp',why:'simp',eq:`2x + ${older} = ${sum}`},{op:'isol',why:'isol',eq:`2x = ${sum-older}`},{op:'div',why:'div',eq:`x = ${younger}`},{op:'solve',why:'solve',eq:lang==='es'?`Menor = ${younger} años,  Mayor = ${olderAge} años`:`Younger = ${younger} yrs,  Older = ${olderAge} yrs`}],
+      answer:lang==='es'?`Menor: ${younger} años,  Mayor: ${olderAge} años`:`Younger: ${younger} yrs,  Older: ${olderAge} yrs`,type:'open'};
+  }
+  const x=rnd(1,6),y=rnd(1,6),a1=rnd(1,3),b1=rnd(1,3),a2=rnd(1,3),b2=rnd(1,3);
+  const c1=a1*x+b1*y,c2=a2*x+b2*y;
+  return{level:2,q:lang==='es'?'Resuelve el sistema de ecuaciones:':'Solve the system of equations:',
+    eq:`${a1}x + ${b1}y = ${c1}\n${a2}x + ${b2}y = ${c2}`,
+    steps:[{op:'elim',why:'elim',eq:lang==='es'?`Multiplicamos la ec. 1 por ${b2} y la ec. 2 por ${b1}:`:`Multiply eq.1 by ${b2} and eq.2 by ${b1}:`},{op:'simp',why:'simp',eq:`${a1*b2}x + ${b1*b2}y = ${c1*b2}`},{op:'simp',why:'simp',eq:`${a2*b1}x + ${b2*b1}y = ${c2*b1}`},{op:'elim',why:'elim',eq:lang==='es'?`Restamos: (${a1*b2-a2*b1})x = ${c1*b2-c2*b1}  →  x = ${x}`:`Subtract: (${a1*b2-a2*b1})x = ${c1*b2-c2*b1}  →  x = ${x}`},{op:'sust',why:'sust',eq:`${a1}(${x}) + ${b1}y = ${c1}  →  y = ${y}`},{op:'check',why:'check',eq:lang==='es'?`Verificación: (${x}, ${y}) ✓`:`Check: (${x}, ${y}) ✓`}],
+    answer:`x = ${x},  y = ${y}`,type:'open'};
+}
+
+const generators=[genFunction,genEquation,genLinear,genApp];
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderTabs(){
+  const bar=document.getElementById('tab-bar');
+  const lbl=window.innerWidth<500?t('tabsShort'):t('tabs');
+  bar.innerHTML=lbl.map((l,i)=>`<button class="tab${tab===i?' active':''}" onclick="setTab(${i})">${l}</button>`).join('')
+    +`<button class="tab tab-finish" onclick="showScore()">${t('finish')}</button>`;
+}
+
+function setTab(i){tab=i;revealed=false;currentEx=null;renderTabs();newExercise();}
+function toggleLang(){lang=lang==='es'?'en':'es';document.getElementById('lang-lbl').textContent=lang==='es'?'English':'Español';currentEx=null;revealed=false;renderTabs();newExercise();}
+
+function newExercise(){currentEx=generators[tab]();exTotal++;updateProg();renderMain();}
+function updateProg(){document.getElementById('prog-txt').textContent=`${exCorrect} / ${exTotal}`;}
+
+function renderMain(){
+  const ex=currentEx;
+  const main=document.getElementById('main-area');
+  let h=`<div class="card">`;
+  h+=`<div class="ex-header"><span style="font-size:15px;font-weight:600;color:var(--gray-700)">${t('problem')} ${exTotal}</span><span class="level-badge ${['lv-basic','lv-mid','lv-adv'][ex.level]}">${t('level')[ex.level]}</span></div>`;
+  const eqLines=ex.eq?ex.eq.split('\n'):[];
+  h+=`<div class="problem-box">${ex.q}`;
+  if(eqLines.length===1)h+=`<div class="eq">${ex.eq}</div>`;
+  if(eqLines.length===2)h+=`<div class="eq">${eqLines[0]}<br>${eqLines[1]}</div>`;
+  h+=`</div>`;
+
+  if(ex.type==='graph_mc'&&!revealed){
+    h+=`<p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">${t('selOpt')}</p><div class="graph-opts">`;
+    ex.graphs.forEach((g,i)=>{
+      const lbl=String.fromCharCode(65+i);
+      h+=`<button class="graph-opt-btn" id="gopt${i}" onclick="answerGraphMC(${i})">${drawGraph(g.m,g.b)}<span class="graph-opt-lbl">${lbl}) y=${g.m}x${g.b>=0?'+':''}${g.b}</span></button>`;
+    });
+    h+=`</div><div id="fb"></div>`;
+  }
+  if(ex.type==='mc'&&!revealed){
+    h+=`<p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">${t('selOpt')}</p><div class="opt-grid">`;
+    ex.opts.forEach((o,i)=>h+=`<button class="opt-btn" id="opt${i}" onclick="answerMC(${i})">${String.fromCharCode(97+i)})  ${o}</button>`);
+    h+=`</div><div id="fb"></div>`;
+  }
+  if(ex.showGraph&&(revealed||ex.type==='open')){
+    h+=`<div class="graph-wrap">${drawGraphLarge(ex.graphM,ex.graphB)}</div>`;
+  }
+  if(revealed||ex.type==='open'){
+    h+=`<div class="steps-container">`;
+    ex.steps.forEach((s,idx)=>{
+      h+=`<div class="step" style="animation-delay:${idx*0.06}s"><div class="step-num">${idx+1}</div><div class="step-body"><div class="step-op">${t('ops')[s.op]||s.op}</div><div class="step-eq">${s.eq}</div><div class="step-why">${t('why')[s.why]||''}</div></div></div>`;
+    });
+    h+=`</div><div class="answer-box"><div class="ans-label">${t('answer')}</div><div class="ans-val">${ex.answer}</div></div>`;
+  }
+  h+=`<div class="btn-row" id="btn-row">`;
+  if(!revealed&&ex.type==='open') h+=`<button class="btn-secondary" onclick="revealSteps()">${t('reveal')}</button>`;
+  if(revealed||ex.type==='open') h+=`<button class="btn-primary" onclick="nextEx()">${t('next')}</button>`;
+  h+=`</div></div>`;
+  main.innerHTML=h;
+}
+
+function answerMC(i){
+  const ex=currentEx;
+  document.querySelectorAll('.opt-btn').forEach((b,j)=>{b.disabled=true;if(j===ex.correct)b.classList.add('correct');else if(j===i)b.classList.add('wrong');});
+  if(i===ex.correct)exCorrect++;
+  updateProg();
+  document.getElementById('fb').innerHTML=`<div class="feedback ${i===ex.correct?'fb-ok':'fb-no'}">${i===ex.correct?(lang==='es'?'¡Correcto!':'Correct!'):(lang==='es'?`Incorrecto. Respuesta correcta: ${ex.opts[ex.correct]}`:`Incorrect. Correct: ${ex.opts[ex.correct]}`)}</div>`;
+  revealSteps(true);
+}
+function answerGraphMC(i){
+  const ex=currentEx;
+  document.querySelectorAll('.graph-opt-btn').forEach((b,j)=>{b.disabled=true;if(j===ex.correct)b.classList.add('correct');else if(j===i)b.classList.add('wrong');});
+  if(i===ex.correct)exCorrect++;
+  updateProg();
+  document.getElementById('fb').innerHTML=`<div class="feedback ${i===ex.correct?'fb-ok':'fb-no'}">${i===ex.correct?(lang==='es'?'¡Correcto!':'Correct!'):(lang==='es'?`Incorrecto. Correcta: Gráfica ${String.fromCharCode(65+ex.correct)}`:`Incorrect. Correct: Graph ${String.fromCharCode(65+ex.correct)}`)}</div>`;
+  revealSteps(true);
+}
+function revealSteps(skip){revealed=true;if(!skip){exCorrect++;updateProg();}document.getElementById('btn-row').innerHTML=`<button class="btn-primary" onclick="nextEx()">${t('next')}</button>`;renderMain();}
+function nextEx(){revealed=false;currentEx=generators[tab]();exTotal++;updateProg();renderMain();}
+
+function showScore(){
+  const score=exTotal>0?(exCorrect/exTotal*10):0;
+  const s=score.toFixed(1);
+  let pi=0;if(score>=9)pi=3;else if(score>=8)pi=2;else if(score>=7)pi=1;
+  const pc=['perf-insuf','perf-suf','perf-good','perf-exc'];
+  document.getElementById('main-area').innerHTML=`<div class="card score-card">
+    <div class="score-circle"><div class="score-num">${s}</div><div class="score-denom">/10</div></div>
+    <div class="score-label">${t('score')}</div>
+    <div class="perf-badge ${pc[pi]}">${t('perf')[pi]}  ${t('perfRange')[pi]}</div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val">${exTotal}</div><div class="stat-lbl">${t('answered')}</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--green)">${exCorrect}</div><div class="stat-lbl">${t('correct')}</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--red)">${exTotal-exCorrect}</div><div class="stat-lbl">${t('incorrect')}</div></div>
+    </div>
+    <div style="margin-top:26px"><button class="btn-primary" onclick="resetAll()">${t('restart')}</button></div>
+  </div>`;
+}
+function resetAll(){exTotal=0;exCorrect=0;currentEx=null;revealed=false;tab=0;renderTabs();newExercise();}
+
+renderTabs();
+newExercise();
+</script>
+</body>
+</html>
